@@ -2,6 +2,7 @@
 #include <map>
 #include <string>
 #include <iostream>
+#include <memory>
 
 using namespace std;
 
@@ -13,14 +14,27 @@ struct Node{
 
 class Tree {
  public: 
+	Tree () : root(new Node) {}
+	void build(std::string s);
 	void buildTree(std::string s, Node* p);
-	std::string printTree(Node* root);
+	std::string print();
+	int compute();
  private:
 	int findLowestExp(std::string s);
 	std::string removePat(std::string s);
-	// std::string printTree(Node* root);
-	Node* root;
+	std::string printTree(Node* root);
+
+	std::unique_ptr<Node> root;
 };
+
+void Tree::build(std::string s) {
+	buildTree(s, root.get());
+}
+
+std::string Tree::print() {
+	auto result = printTree(root.get());
+	return result;
+}
 
 std::string Tree::printTree(Node* root) {
 	// middle order with recursion
@@ -107,7 +121,10 @@ int main() {
 	std::cout << "Expression Binary Tree";
 	Tree tree;
 	Node root;
-	tree.buildTree("(e+f)*a*b+c", &root);
-	std::cout << "middle tree: " << tree.printTree(&root) << std::endl;
+	// tree.buildTree("(e+f)*a*b+c", &root);
+	tree.build("(e+f)*a*b+c");
+	// std::cout << "middle tree: " << tree.printTree(&root) << std::endl;
+	std::cout << "middle tree: " << tree.print() << std::endl;
+
 	return 0;
 }
