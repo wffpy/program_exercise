@@ -119,6 +119,7 @@ int Tree::findLowestExp(std::string s) {
 		}
 		if (prior < lowest) {
 			pos = index;
+			prior = lowest;
 		}
 		index++;
 	}
@@ -147,15 +148,13 @@ void Tree::buildTree(std::string s, Node* p) {
 	}
 }
 
-int main() {
-	std::cout << "Expression Binary Tree";
-	Tree tree;
-	Node root;
-	// tree.buildTree("(e+f)*a*b+c", &root);
-	tree.build("(1+2)*3*4+5");
-	// std::cout << "middle tree: " << tree.printTree(&root) << std::endl;
-	std::cout << "middle tree: " << tree.print() << std::endl;
-	std:cout << "compute: " << tree.compute() << std::endl; 
+// int main() {
+// 	std::cout << "Expression Binary Tree";
+// 	Tree tree;
+// 	Node root;
+// 	tree.build("(1+2)*3*4+5");
+// 	std::cout << "middle tree: " << tree.print() << std::endl;
+// 	std:cout << "compute: " << tree.compute() << std::endl; 
 
-	return 0;
-}
+// 	return 0;
+// }

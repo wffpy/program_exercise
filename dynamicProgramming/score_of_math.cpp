@@ -2,12 +2,161 @@
 #include <algorithm>
 #include <string>
 #include <iostream>
+#include <memory>
 using namespace std;
+
+struct Node{
+	std::string data;
+	struct Node* left;
+	struct Node* right;
+};
+
+class Tree {
+ public: 
+	Tree () : root(new Node) {}
+	void build(std::string s);
+	void buildTree(std::string s, Node* p);
+	std::string print();
+	int compute();
+ private:
+	int findLowestExp(std::string s);
+	std::string removePat(std::string s);
+	std::string printTree(Node* root);
+	int computeNode(Node* node);
+
+	std::unique_ptr<Node> root;
+};
+
+int Tree::computeNode(Node* node) {
+	int result = 0;
+	auto left_node = node->left;
+	auto right_node = node->right;
+	if ((left_node == nullptr) && (right_node == nullptr)) {
+		result = std::stoi(node->data);
+	} else if ((left_node != nullptr) && (right_node != nullptr)) {
+		switch(node->data[0]) {
+			case '+': {
+				result = computeNode(left_node) + computeNode(right_node);
+				break;
+			}
+			case '*' : {
+				result = computeNode(left_node) * computeNode(right_node);
+				break;
+			}
+			default:
+				std::cout << "error!!!!!!!!!!!!!!!!!!!" << std::endl;
+				break;
+		}
+	}
+	// std::cout << "temp_result: " << result << std::endl;
+	return result;
+}
+
+int Tree::compute() {
+	// suffix order traverse
+	std::cout << "printTree: " << print() << std::endl;
+	return computeNode(root.get());
+}
+
+void Tree::build(std::string s) {
+	buildTree(s, root.get());
+}
+
+std::string Tree::print() {
+	auto result = printTree(root.get());
+	return result;
+}
+
+std::string Tree::printTree(Node* root) {
+	// middle order with recursion
+	std::string result = "";
+	Node* left = root->left;
+	Node* right = root->right;
+	if (left != NULL) {
+		std:string left_exp = printTree(left);
+		result += left_exp;
+	}
+	result += root->data;
+	if (right != NULL) {
+		std::string right_exp = printTree(right);
+		result += right_exp;
+	}
+	return result;
+}
+
+std::string Tree::removePat(std::string s) {
+	if (s[0] == '(' && s[s.size() -1] == ')') {
+		s = s.substr(1, s.size() -2);
+	}
+	return s;
+}
+
+int Tree::findLowestExp(std::string s) {
+	int pos = -1;
+	int lowest = 100;
+	for (int index = 0; index < s.size();) {
+		int prior = -1;
+		std::cout << "char: " << s[index] << std::endl;
+		switch (s[index]) 
+		{
+			case '+': {
+				prior = 0;
+				break;
+			}
+			case '*' : {
+				prior = 1;
+				break;
+			}
+			case '(' : {
+				prior = 100;
+				while(s[index] != ')') {
+					index++;
+				}
+				break;
+			}
+		default:
+			index++;
+			continue;
+			break;
+		}
+		if (prior < lowest) {
+			std::cout << "char: " << s[index] << std::endl;
+			pos = index;
+			lowest = prior;
+		}
+		index++;
+	}
+	return pos;
+}
+
+void Tree::buildTree(std::string s, Node* p) {
+	int pos = findLowestExp(s);
+	std::cout << "input_str: " << s << std::endl;
+	std::cout << "pos: " << pos << std::endl;
+	if (pos != -1) {
+		p->data = s[pos];
+		Node* left = new Node();
+		Node* right = new Node();
+		p->left = left;
+		p->right = right;
+		std::string left_exp = removePat(s.substr(0, pos));
+		std::string right_exp = removePat(s.substr(pos + 1));
+		std::cout << "left_exp: " << left_exp << "   right_exp: " << right_exp << std::endl;
+		buildTree(left_exp, left);
+		buildTree(right_exp, right);
+	} else {
+		p->data = s;
+		p->left = NULL;
+		p->right = NULL;
+	}
+}
 
 class Solution {
 public:
     int scoreOfStudents(string s, vector<int>& answers) {
-			compute(s);
+			auto non_space_str = clearSpace(s);
+			auto right_result = compute(non_space_str);
+			std::cout << "right_result: " << right_result << std::endl;
 			return 0;
     }
 	// std::string clearSpace(std::string s);
@@ -15,85 +164,14 @@ private:
 	int compute(string s);
 	std::string clearSpace(std::string s);
 	int char2Int(char c);
-	int getValue(std::string s, int pos, bool dir);
-	std::string updateComputeStr(std::string s, int pos, int val);
+	// int getValue(std::string s, int pos, bool dir);
+	// std::string updateComputeStr(std::string s, int pos, int val);
+	Tree binary_tree;
 };
 
-int Solution::getValue(std::string s, int pos, bool dir) {
-	int result = 0;
-	int start = pos;
-	if (dir) {
-		auto pre_pos = s.find_last_of("+", pos);
-		if (pre_pos == std::string::npos) {
-			pre_pos = s.find_last_of("*", pos);
-		}
-		if (pre_pos != std::string::npos) {
-			auto sub_str = s.substr(pre_pos+1, pos-pre_pos-1);
-			result = std::stoi(sub_str);
-		} else {
-			auto sub_str = s.substr(0, pos);
-			result = std::stoi(sub_str);
-		}
-	} else {
-		auto suf_pos = s.find_first_of("+", pos);
-		if (suf_pos == std::string::npos) {
-			suf_pos = s.find_first_of("*", pos);
-		}
-		if (suf_pos != std::string::npos) {
-			auto sub_str = s.substr(pos+1, suf_pos);
-			result = std::stoi(sub_str);
-		} else {
-			auto sub_str = s.substr(pos+1);
-			result = std::stoi(sub_str);
-		}
-	}
-	return result;
-}
-
-std::string Solution::updateComputeStr(std::string s, int pos, int val) {
-	std::string result;
-	auto pre_pos = s.find_last_of("+", pos);
-	if (pre_pos == std::string::npos) {
-		pre_pos = s.find_last_of("*", pos);
-		if (pre_pos == std::string::npos) {
-			pre_pos = 0;
-		}
-	}
-	auto suf_pos = s.find_first_of("+", pos);
-	if (suf_pos == std::string::npos) {
-		suf_pos = s.find_first_of("*", pos);
-	}
-	s.replace(pre_pos+1, suf_pos-1, std::to_string(val));
-	result = s;
-	return result;
-}
-
-int Solution::compute(std::string s) {
-	int result = 0;
-	auto str = clearSpace(s);
-	std:cout << "clearspace str: " << str << std::endl;
-	std::size_t found = str.find("*");
-	if (found != std::string::npos) {
-		int lhs = getValue(str, found, true);
-		int rhs = getValue(str, found, false);
-		std::cout << "lhs: " << lhs << "    rhs: " << rhs << std::endl;
-		int temp_result = lhs * rhs;
-		auto update_str = updateComputeStr(s, found, temp_result);
-		compute(update_str);
-	} else {
-		std::size_t found = str.find("+");
-		if (found != std::string::npos) {
-			int lhs = getValue(str, found, true);
-			int rhs = getValue(str, found, false);
-			std::cout << "lhs: " << lhs << "    rhs: " << rhs << std::endl;
-			int temp_result = lhs * rhs;
-			auto update_str = updateComputeStr(s, found, temp_result);
-			compute(update_str);
-		} else {
-			result = std::stoi(s);
-		}
-	}
-	return result;
+int Solution::compute(string s) {
+	binary_tree.build(s);
+	return binary_tree.compute();
 }
 
 std::string Solution::clearSpace(std::string s) {
@@ -115,7 +193,6 @@ int main() {
 	std::cout << "score of math" << std::endl;
 	std::string computation = "3 + 4 * 5 + 2 * 3";
 	Solution solu;
-	// std::cout << solu.clearSpace(computation) << std::endl;
-	std::vector<int> results = {0, 1, 2, 3};
+	std::vector<int> results = {0, 1, 2, 29};
 	solu.scoreOfStudents(computation, results);
 }
