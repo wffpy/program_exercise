@@ -23,9 +23,39 @@ class Tree {
 	int findLowestExp(std::string s);
 	std::string removePat(std::string s);
 	std::string printTree(Node* root);
+	int computeNode(Node* node);
 
 	std::unique_ptr<Node> root;
 };
+
+int Tree::computeNode(Node* node) {
+	int result = 0;
+	auto left_node = node->left;
+	auto right_node = node->right;
+	if ((left_node == nullptr) && (right_node == nullptr)) {
+		result = std::stoi(node->data);
+	} else if ((left_node != nullptr) && (right_node != nullptr)) {
+		switch(node->data[0]) {
+			case '+': {
+				result = computeNode(left_node) + computeNode(right_node);
+				break;
+			}
+			case '*' : {
+				result = computeNode(left_node) * computeNode(right_node);
+				break;
+			}
+			default:
+				std::cout << "error!!!!!!!!!!!!!!!!!!!" << std::endl;
+				break;
+		}
+	}
+	return result;
+}
+
+int Tree::compute() {
+	// suffix order traverse
+	return computeNode(root.get());
+}
 
 void Tree::build(std::string s) {
 	buildTree(s, root.get());
@@ -122,9 +152,10 @@ int main() {
 	Tree tree;
 	Node root;
 	// tree.buildTree("(e+f)*a*b+c", &root);
-	tree.build("(e+f)*a*b+c");
+	tree.build("(1+2)*3*4+5");
 	// std::cout << "middle tree: " << tree.printTree(&root) << std::endl;
 	std::cout << "middle tree: " << tree.print() << std::endl;
+	std:cout << "compute: " << tree.compute() << std::endl; 
 
 	return 0;
 }
