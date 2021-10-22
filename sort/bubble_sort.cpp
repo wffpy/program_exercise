@@ -92,13 +92,37 @@ std::vector<int> MergeSort(std::vector<int>& data) {
 	return data;
 }
 
+int partition(std::vector<int>&data, int start, int end) {
+	int pivot = start;
+	int index = start + 1;
+	for (int i = index; i <= end; i++) {
+		if (data[i] < data[pivot]) {
+			Exchange(data, i, index);
+			index++;
+		}
+	}
+	Exchange(data, pivot, index - 1);
+	return index - 1;
+}
+
+std::vector<int> QuickSort(std::vector<int>& data, int start, int end) {
+	int size = end - start + 1;
+	if (start < end) {
+		int pivot = partition(data, start, end);
+		QuickSort(data, start, pivot - 1);
+		QuickSort(data, pivot + 1, end);
+	}
+	return data;
+}
+
 int main() {
 	std::vector<int> data = {9, 10, 4, 5, 12, 15, 13, 7};
 	// BubbleSort(data);
 	// SelectionSort(data);
 	// InsertSort(data);
 	// std::for_each(data.begin(), data.end(), [&](int num) { std::cout << num << ", "; });
-	auto out = MergeSort(data);
+	// auto out = MergeSort(data);
+	auto out = QuickSort(data, 0, data.size() - 1);
 	std::for_each(out.begin(), out.end(), [&](int num) { std::cout << num << ", "; });
 	std::cout << std::endl;
 }
