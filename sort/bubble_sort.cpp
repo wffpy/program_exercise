@@ -115,6 +115,50 @@ std::vector<int> QuickSort(std::vector<int>& data, int start, int end) {
 	return data;
 }
 
+void modifyHeap(std::vector<int>& data, int index, int len) {
+	int larget_index = index;
+	int larget_value = data[index];
+	int left_index = index * 2 + 1;
+	int right_index = (index + 1) * 2;
+	if (left_index < len && larget_value < data[left_index]) {
+		larget_value = data[left_index];
+		larget_index = left_index;
+	}
+
+	if (right_index < len && larget_value < data[right_index]) {
+		larget_value = data[right_index];
+		larget_index = right_index;
+	}
+
+	if (larget_index != index) {
+		data[larget_index] = data[index];
+		data[index] = larget_value;
+	}
+}
+
+std::vector<int> buildMaxHeap(std::vector<int>& data, int len) {
+	int start_index = len / 2 - 1;
+	for (int index = start_index; index >= 0; index--) {
+		modifyHeap(data, index, len);
+	}
+	return data;
+}
+
+std::vector<int> HeapSort(std::vector<int>& data) {
+	std::vector<int> out;
+	for (int len = data.size(); len > 0; len--) {
+		buildMaxHeap(data, len);
+		std::for_each(data.begin(), data.end(), [&](int num) { std::cout << num << ", "; });
+		std::cout << std::endl;
+		if (data[0] > data[len - 1]) {
+			int temp = data[len - 1];
+			data[len - 1] = data[0];
+			data[0] = temp;
+		}
+	}
+	return data;
+}
+
 int main() {
 	std::vector<int> data = {9, 10, 4, 5, 12, 15, 13, 7};
 	// BubbleSort(data);
@@ -122,7 +166,8 @@ int main() {
 	// InsertSort(data);
 	// std::for_each(data.begin(), data.end(), [&](int num) { std::cout << num << ", "; });
 	// auto out = MergeSort(data);
-	auto out = QuickSort(data, 0, data.size() - 1);
+	// auto out = QuickSort(data, 0, data.size() - 1);
+	auto out = HeapSort(data);
 	std::for_each(out.begin(), out.end(), [&](int num) { std::cout << num << ", "; });
 	std::cout << std::endl;
 }
