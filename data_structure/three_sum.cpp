@@ -32,10 +32,12 @@ class Solution {
 				if (first == second) break;
 				// std::cout << "first: " << first << "  second: " << second << std::endl;
 				// std::cout << "first: " << nums[first] << "  second: " << nums[second] << std::endl;
+				int need = 0 - nums [first] - nums[second];
 				if (nums[first] + nums[second] >= 0) {
 					third = first + 1;
 					if (third > size -1 || third == first || third == second) break;
-					while (nums[third] <= 0) {
+					if ( third > first + 1 && nums[third] == nums[third - 1]) break;
+					while (nums[third] <= need) {
 						if (nums[first] + nums[second] + nums[third] == 0) {
 							// std::cout << "success !!!!!!!!" << std::endl;
 							out.push_back({nums[first], nums[third], nums[second]});
@@ -46,7 +48,8 @@ class Solution {
 				} else {
 					third = second - 1;
 					if (third < 0 || third == first || third == second) break;
-					while(nums[third] > 0) {
+					if ( third < second - 1 && nums[third] == nums[third + 1]) break;
+					while(nums[third] >= need) {
 						if (nums[first] + nums[second] + nums[third] == 0) {
 							// std::cout << "success !!!!!!!!" << std::endl;
 							out.push_back({nums[first], nums[third], nums[second]});
