@@ -42,7 +42,7 @@ int main() {
 	Solution solu;
 	std::vector<int> inputs = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17};
 	Node* root = buildTree<int>(inputs);
-	std::vector<int> outputs = InOrder<int>(root);
+	std::vector<int> outputs = TraverseTree<int>(root, ORDERTYPE::INORDER);
 	std::for_each(outputs.begin(), outputs.end(), [&](int val) { std::cout << val << ", "; });
 	std::cout << std::endl;
 	auto out = solu.zigzagLevelOrder(root);

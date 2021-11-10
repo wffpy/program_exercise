@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 
+enum ORDERTYPE {PREORDER, INORDER, POSTORDER};
 template<typename DATATYPE>
 struct TreeNode
 {
@@ -41,6 +42,24 @@ TreeNode<DATATYPE>* buildTree(std::vector<DATATYPE> inputs) {
 	return root;
 }
 
+// pre order traverse
+template<typename DATATYPE>
+void PreOrderImpl(TreeNode<DATATYPE>* root, std::list<DATATYPE>& values) {
+	if (root == nullptr) return;
+	values.push_back(root->val);
+	PreOrderImpl(root->left, values);
+	PreOrderImpl(root->right, values);
+}
+
+template<typename DATATYPE>
+void PostOrderImpl(TreeNode<DATATYPE>* root, std::list<DATATYPE>& values) {
+	if (root == nullptr) return;
+	PostOrderImpl(root->left, values);
+	PostOrderImpl(root->right, values);
+	values.push_back(root->val);
+}
+
+// in order traverse
 template<typename DATATYPE>
 void InOrderImpl(TreeNode<DATATYPE>* root, std::list<DATATYPE>& values) {
 	if (root == nullptr) return;
@@ -50,13 +69,28 @@ void InOrderImpl(TreeNode<DATATYPE>* root, std::list<DATATYPE>& values) {
 }
 
 template<typename DATATYPE>
-std::vector<DATATYPE> InOrder(TreeNode<DATATYPE>* root) {
+std::vector<DATATYPE> TraverseTree(TreeNode<DATATYPE>* root, ORDERTYPE order) {
 	std::list<DATATYPE> values;
-	InOrderImpl<DATATYPE>(root, values);
+	if (order == ORDERTYPE::PREORDER) {
+		InOrderImpl<DATATYPE>(root, values);
+	}
+	switch (order) {
+		case ORDERTYPE::PREORDER: {
+			PreOrderImpl(root, values);
+			break;
+		}
+		case ORDERTYPE::INORDER: {
+			InOrderImpl(root, values);
+			break;
+		}
+		case ORDERTYPE::POSTORDER: {
+			PostOrderImpl(root, values);
+			break;
+		}
+	}
 	int node_size = values.size();
 	std::vector<DATATYPE> outputs;
 	outputs.resize(node_size);
-	std::cout << "node_size: " << node_size << std::endl;
 	std::copy(values.begin(), values.end(), outputs.begin());
 	return outputs;
 }
