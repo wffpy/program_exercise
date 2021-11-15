@@ -36,3 +36,5 @@ target_include_directories(zigzagLevelOrder PUBLIC
                           "${PROJECT_BINARY_DIR}"
                           "${PROJECT_SOURCE_DIR}/tree_lib"
                           )
+
+add_executable(pural_matrix_dot  pural_matrix_dot.cpp)
